@@ -1,1 +1,3 @@
 .idea
+/main-application/src/main/resources/static/js/axios.min.js
+/main-application/src/main/resources/static/tempfile/*

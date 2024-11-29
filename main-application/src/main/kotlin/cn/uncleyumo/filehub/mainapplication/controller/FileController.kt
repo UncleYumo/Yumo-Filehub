@@ -97,7 +97,7 @@ class FileController {
             }
         }.toList()
 
-        LogPrinter.info("File list: \n$fileInfoList")
+//        LogPrinter.info("File list: \n$fileInfoList")
         return Result.success(data = fileInfoList)
     }
 

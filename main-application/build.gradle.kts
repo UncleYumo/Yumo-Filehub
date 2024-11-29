@@ -49,6 +49,12 @@ kotlin {
 	}
 }
 
+tasks.jar {
+	manifest {
+		attributes["Main-Class"] = "cn.uncleyumo.filehub.mainapplication.MainApplication"
+	}
+}
+
 tasks.withType<Test> {
 	useJUnitPlatform()
 }
