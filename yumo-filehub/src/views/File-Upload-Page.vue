@@ -46,10 +46,11 @@
 
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue';
-import { GithubOutlined } from '@vicons/antd';
-import { BookSearch24Filled } from '@vicons/fluent';
-import { HelpCenterFilled } from '@vicons/material';
+import {onMounted, ref} from 'vue';
+import {GithubOutlined} from '@vicons/antd';
+import {BookSearch24Filled} from '@vicons/fluent';
+import {HelpCenterFilled} from '@vicons/material';
+import {useTokenStore} from "@/stores/tokenStore";
 
 import FileUpload from '../components/File-Upload-Page/FileUpload.vue'
 import ArrowCircleDown48Regular from '@vicons/fluent/ArrowCircleDown48Regular';
@@ -87,6 +88,14 @@ const goToFileRetrieve = () => {
   window.location.href = '/retrieve';
 };
 
+onMounted(() => {
+  let tokenStore = useTokenStore();
+  if (tokenStore.token === '') {
+    alert('You have to Verify your Access-Key Firstly!');
+    window.location.href = '/authorize';
+  }
+})
+
 </script>
 
 <style lang="scss" scoped>
@@ -117,10 +126,10 @@ const goToFileRetrieve = () => {
 
       div {
         span {
-          margin-left: 14px;
+          //margin-left: 14px;
           color: #7D60FD;
           font-weight: bold;
-          font-size: 14px;
+          font-size: 12px;
         }
       }
     }
@@ -131,6 +140,8 @@ const goToFileRetrieve = () => {
 
     .slogan-content {
       padding: 8px;
+      margin-top: 16px;
+      margin-bottom: 16px;
 
       //background-color: #d51d1d;
       .h1-slogan {
@@ -173,6 +184,7 @@ const goToFileRetrieve = () => {
 
       div {
         margin: 8px;
+
         span {
           margin-left: 18px;
           color: #7D60FD;
@@ -230,6 +242,7 @@ const goToFileRetrieve = () => {
       div {
 
         margin: 8px;
+
         span {
           margin-left: 18px;
           color: #7D60FD;

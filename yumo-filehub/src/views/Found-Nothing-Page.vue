@@ -40,7 +40,6 @@ html {
   font-family: 'Gilda Display', serif;
   font-size: 95px;
   font-style: italic;
-  text-align: center;
   width: 100px;
   height: 60px;
   line-height: 60px;

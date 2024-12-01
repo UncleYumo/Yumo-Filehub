@@ -1,22 +1,27 @@
-import { createApp } from 'vue'
-import { createPinia } from 'pinia'
+import { createApp } from 'vue';
 
-import App from './App.vue'
-import router from './router'
+import { createPinia  } from 'pinia'
+// import { createPersistedState } from 'pinia-persistedstate-plugin'
+import { createPersistedState } from 'pinia-plugin-persistedstate'
+
+import App from './App.vue';
+import router from './router';
 
 // ElementPlus
-import ElementPlus from 'element-plus'
-import 'element-plus/dist/index.css'
-import 'element-plus/theme-chalk/dark/css-vars.css'
+import ElementPlus from 'element-plus';
+import 'element-plus/dist/index.css';
+import 'element-plus/theme-chalk/dark/css-vars.css';
 
 // Naive UI
-import naive from 'naive-ui'
+import naive from 'naive-ui';
 
-const app = createApp(App)
+const pinia = createPinia()
+pinia.use(createPersistedState())
 
-app.use(ElementPlus)
-app.use(naive)
-app.use(createPinia())
-app.use(router)
+const app = createApp(App);
 
-app.mount('#app')
+app.use(ElementPlus);
+app.use(naive);
+app.use(pinia); // 使用 Pinia 实例
+app.use(router);
+app.mount('#app');
