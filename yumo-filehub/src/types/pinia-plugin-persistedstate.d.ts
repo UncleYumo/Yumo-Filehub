@@ -1,1 +1,0 @@
-import 'pinia-plugin-persistedstate';
