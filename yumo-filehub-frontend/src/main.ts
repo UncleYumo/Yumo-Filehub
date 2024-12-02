@@ -1,7 +1,6 @@
 import { createApp } from 'vue';
 
 import { createPinia  } from 'pinia'
-// import { createPersistedState } from 'pinia-persistedstate-plugin'
 import { createPersistedState } from 'pinia-plugin-persistedstate'
 
 import App from './App.vue';
