@@ -19,6 +19,7 @@ import java.io.IOException
  * @updateTime 2024/12/2
  * @description 提供文件保存、读取、删除等操作
  */
+
 @Component
 class FileManipulationUtil {
 
@@ -34,19 +35,32 @@ class FileManipulationUtil {
      * @param accessKey 子文件夹名称
      * @param file 文件对象
      */
-    @Throws(IOException::class)
-    fun saveFile(accessKey: String, file: MultipartFile) {
+    fun saveFile(accessKey: String, file: MultipartFile): String {
+
+        // 防止文件名中有特殊字符
+        if (file.originalFilename?.contains("/") == true) {
+            throw IllegalArgumentException("File name cannot contain '/'")
+        }
+
+        if (file.size > 200 * 1024 * 1024) {
+            throw IllegalArgumentException("File size cannot exceed 200MB")
+        }
+
         // 创建子文件夹
         val directory = File(rootLocation, accessKey).also { if (!it.exists()) it.mkdirs() }
 
         // 获取原始文件名
-        val originalFilename = file.originalFilename ?: throw IllegalArgumentException("文件名不能为空")
+        val originalFilename = file.originalFilename ?: throw IllegalArgumentException("File name cannot be null")
 
         // 构建目标文件路径
         val targetFile = File(directory, originalFilename)
 
         // 将上传的文件保存到目标位置
         file.transferTo(targetFile)
+
+        val fileName = targetFile.name
+
+        return fileName
     }
 
     /**

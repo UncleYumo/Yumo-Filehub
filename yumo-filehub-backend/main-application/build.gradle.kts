@@ -30,13 +30,7 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-data-redis")
 	implementation("org.springframework.boot:spring-boot-starter-validation")  // 对于参数校验
 	implementation("org.springframework.boot:spring-boot-starter-log4j2")  // 日志
-
-	implementation("com.alibaba.fastjson2:fastjson2-extension-spring5:2.0.53")
-//	implementation("com.alibaba.fastjson2:fastjson2:2.0.53")  // 对于 JSON序列化 fastjson2
-//	implementation("com.alibaba:fastjson2-spring-boot-starter:1.0.23")
-
-//	implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")  // 添加 jackson-datatype-jsr310 依赖
-//	implementation("com.fasterxml.jackson.module:jackson-module-kotlin") // 对于 JSON序列化
+	implementation("com.alibaba.fastjson2:fastjson2-extension-spring5:2.0.53")  // fastjson2 序列化
 
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
