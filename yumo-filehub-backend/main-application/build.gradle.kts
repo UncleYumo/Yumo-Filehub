@@ -31,6 +31,8 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-validation")  // 对于参数校验
 	implementation("org.springframework.boot:spring-boot-starter-log4j2")  // 日志
 	implementation("com.alibaba.fastjson2:fastjson2-extension-spring5:2.0.53")  // fastjson2 序列化
+	implementation("com.auth0:java-jwt:4.4.0")
+
 
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
