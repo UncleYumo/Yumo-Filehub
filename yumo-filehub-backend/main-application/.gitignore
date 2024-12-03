@@ -40,3 +40,5 @@ out/
 .kotlin
 /src/main/resources/application.yml
 /src/main/resources/yumo-filehub-store/*
+/src/main/kotlin/filehub/uncleyumo/cn/mainapplication/utils/JwtUtil.kt
+**/JwtUtil.kt
