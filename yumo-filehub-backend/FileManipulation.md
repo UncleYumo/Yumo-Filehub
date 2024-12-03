@@ -29,7 +29,7 @@ import java.util.stream.Collectors
 @Component
 class FileManipulationUtil(private val resourceLoader: ResourceLoader) {
     // 文件存储根目录
-    private val rootLocation = "filestore"
+    private val rootLocation = "yumo-filehub-store"
 
     init {
         // 初始化时检查根目录是否存在，如果不存在则创建

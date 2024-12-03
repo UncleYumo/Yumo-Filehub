@@ -1,12 +1,11 @@
 package filehub.uncleyumo.cn.mainapplication.utils
 
-import org.springframework.core.io.ResourceLoader
+import org.springframework.core.io.ClassPathResource
 import org.springframework.stereotype.Component
+import org.springframework.web.multipart.MultipartFile
 import java.io.File
-import java.nio.file.Files
-import java.nio.file.Paths
-import java.util.stream.Collectors
-import kotlin.io.path.isDirectory
+import java.io.FileOutputStream
+import java.io.IOException
 
 /**
  * 文件操作工具类
@@ -18,87 +17,74 @@ import kotlin.io.path.isDirectory
  * @stuNumber 22344131
  * @createTime 2024/12/2
  * @updateTime 2024/12/2
- * @description 提供文件保存、读取、删除等基本操作
+ * @description 提供文件保存、读取、删除等操作
  */
-
 @Component
-class FileManipulationUtil(private val resourceLoader: ResourceLoader) {
-    // 文件存储根目录
-    private val rootLocation = "yumo-filehub-store"
+class FileManipulationUtil {
 
-    init {
-        // 初始化时检查根目录是否存在，如果不存在则创建
-        Files.createDirectories(Paths.get(resourceLoader.getResource(rootLocation).file.toURI()))
+    // 定义存储文件的根位置（使用ClassPathResource来获取资源文件目录）
+    val rootLocation: File = ClassPathResource("yumo-filehub-store").file.also {
+        if (!it.exists()) {
+            it.mkdirs() // 如果不存在，则创建目录
+        }
     }
 
     /**
      * 保存文件
-     *
      * @param accessKey 子文件夹名称
-     * @param file 上传的文件
+     * @param file 文件对象
      */
-    fun saveFile(accessKey: String, file: File) {
-        // 获取目标文件夹路径
-        val targetDir = Paths.get(resourceLoader.getResource("$rootLocation/$accessKey").file.toURI())
-        if (!Files.exists(targetDir)) {
-            Files.createDirectory(targetDir)
-        }
-        // 将文件复制到目标文件夹
-        Files.copy(file.toPath(), targetDir.resolve(file.name))
+    @Throws(IOException::class)
+    fun saveFile(accessKey: String, file: MultipartFile) {
+        // 创建子文件夹
+        val directory = File(rootLocation, accessKey).also { if (!it.exists()) it.mkdirs() }
+
+        // 获取原始文件名
+        val originalFilename = file.originalFilename ?: throw IllegalArgumentException("文件名不能为空")
+
+        // 构建目标文件路径
+        val targetFile = File(directory, originalFilename)
+
+        // 将上传的文件保存到目标位置
+        file.transferTo(targetFile)
     }
 
     /**
-     * 读取文件
-     *
+     * 获取文件
      * @param accessKey 子文件夹名称
-     * @param content 文件名
+     * @param fileName 文件名
      * @return 文件对象
      */
-    fun getFile(accessKey: String, content: String): File? {
-        return File(resourceLoader.getResource("$rootLocation/$accessKey/$content").file.toURI()).takeIf { it.exists() }
+    fun getFile(accessKey: String, fileName: String): File? {
+        return File(rootLocation, "$accessKey/$fileName").takeIf { it.exists() }
     }
 
     /**
      * 删除文件
-     *
      * @param accessKey 子文件夹名称
      * @param fileName 文件名
      */
     fun deleteFile(accessKey: String, fileName: String) {
-        val fileToDelete = File(resourceLoader.getResource("$rootLocation/$accessKey/$fileName").file.toURI())
-        if (fileToDelete.exists()) {
-            fileToDelete.delete()
-        }
+        File(rootLocation, "$accessKey/$fileName").delete()
     }
 
     /**
-     * 获取指定子文件夹下的文件总大小
-     *
+     * 获取文件目录大小
      * @param accessKey 子文件夹名称
-     * @return 文件总大小（字节）
+     * @return 目录大小
      */
     fun getFileDirectorySize(accessKey: String): Long {
-        val directory = Paths.get(resourceLoader.getResource("$rootLocation/$accessKey").file.toURI())
-        return Files.walk(directory)
-            .filter { p -> !p.isDirectory() }
-            .mapToLong { p -> p.toFile().length() }
-            .sum()
+        val directory = File(rootLocation, accessKey)
+        return if (directory.isDirectory) directory.walk().sumOf { it.length() } else 0L
     }
 
     /**
-     * 获取指定子文件夹下的文件名列表
-     *
+     * 获取文件名列表
      * @param accessKey 子文件夹名称
      * @return 文件名列表
      */
     fun getAccessKeyFileNameList(accessKey: String): List<String>? {
-        val directory = Paths.get(resourceLoader.getResource("$rootLocation/$accessKey").file.toURI())
-        return if (Files.exists(directory)) {
-            Files.list(directory)
-                .map { path -> path.fileName.toString() }
-                .collect(Collectors.toList())
-        } else {
-            null
-        }
+        val directory = File(rootLocation, accessKey)
+        return if (directory.isDirectory) directory.list()?.toList() else null
     }
 }

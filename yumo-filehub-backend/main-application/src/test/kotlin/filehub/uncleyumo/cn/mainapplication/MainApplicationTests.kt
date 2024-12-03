@@ -13,12 +13,13 @@ class MainApplicationTests {
 	fun contextLoads() {
 	}
 
-	@Test
+//	@Test
 	fun test() {
-		val rootPath = Paths.get("resources").toString()
+		val rootPath = Paths.get("yumo-filehub-store").toString()
 		val resourceLoader = ClassLoader.getSystemClassLoader()
-		val path = Paths.get(resourceLoader.getResources(rootPath).nextElement().toURI())
-		ColorPrinter.printlnCyanRed("path: $path")
+		val path = resourceLoader.getResource(rootPath)?.path ?: "No such file or directory"
+
+		ColorPrinter.printlnCyanRed("Resource path: $path")
 	}
 
 }

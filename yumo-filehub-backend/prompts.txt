@@ -37,5 +37,56 @@ class ResultInfo (
 }
 ```
 
+// 文件操作
+我正在使用Springboot3＋Kotlin+Gradle等技术完成一个JavaWeb项目，主要涉及在线的文件存储和读写操作等，下面我提供给你一个基本的文件操作工具类的框架，请按要求完成它：
+package filehub.uncleyumo.cn.mainapplication.utils
+
+import org.springframework.stereotype.Component
+import java.io.File
+
+/**
+ *@author uncle_yumo
+ *@fileName FileManipulationUtils
+ *@proName yumo-filehub-backend
+ *@school Wuxi_University
+ *@stuNumber 22344131
+ *@createTime 2024/12/2
+ *@updateTime 2024/12/2
+ *@description
+ **/
+
+@Component
+class FileManipulationUtil {
+    // 定义文件操作所需要的地址
+
+    // 文件操作方法
+    fun saveFile(accessKey: String, fileOutputStream: FileOutputStream) {
+        // TODO: 实现文件保存功能(accessKey为子文件夹名称，fileOutputStream为上传的文件的文件流)
+    }
+
+    fun getFile(accessKey: String, fileName: String): (用合适的类型)? {
+        // TODO: 实现文件读取功能
+
+    }
+
+    fun deleteFile(accessKey: String, fileName: String) {
+        // TODO: 实现文件删除功能
+    }
+
+    fun getFileDirectorySize(accessKey: String) {
+        // TODO: 实现获取accessKey下文件目录大小功能
+    }
+
+    fun getAccessKeyFileNameList(accessKey: String): List<String>? {
+        // TODO: 实现获取accessKey下文件名列表功能
+    }
+}
+补充的信息如下：
+1. 启动类的绝对路径：D:\Dev_work\java_dev\idea_pros\web_dev\yumo-filehub\yumo-filehub-backend\main-application\src\main\kotlin\filehub\uncleyumo\cn\mainapplication\MainApplication.kt；
+2. 存储文件的根位置：D:\Dev_work\java_dev\idea_pros\web_dev\yumo-filehub\yumo-filehub-backend\main-application\src\main\resources\filestore；
+3. 由于我的项目最终需要迁移到其他服务器，因此你必须使用正确可行的相对路径进行相关操作！！！
+4. 通过请求传入Controller的文件源格式为MultipartFile，你需要告诉我应该如何处理，才能转换成传入工具方法的类型；
+5. 你需要提供一份完整的案例，涉及到业务代码需要完整，中文注释详细！！！（需要将案例代码中设计的所以重要代码补充详细的中文注释，包括注解、配置、引入的业务类、调用的方法和实现等），编码规范，符合当前主流的开发方式，你的案例和教学需要能让我完全明白以上知识点，并可以根据你的内容实现轻松地独自复现和举一反三，记住，最重要的是注释说明一定要详细，关键逻辑做到逐行注释（我的代码基础不好，请体谅）这是一份很难的任务，所以需要你全力以赴，请帮助我！
+
 
 
