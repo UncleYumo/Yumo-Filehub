@@ -1,7 +1,11 @@
 package filehub.uncleyumo.cn.mainapplication.controller
 
+import cn.uncleyumo.utils.ColorPrinter
+import filehub.uncleyumo.cn.mainapplication.entity.pojo.AccessKeyDTO
+import filehub.uncleyumo.cn.mainapplication.entity.pojo.UserDTO
 import filehub.uncleyumo.cn.mainapplication.entity.result.ResultInfo
 import filehub.uncleyumo.cn.mainapplication.service.UserService
+import jakarta.validation.Valid
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.CrossOrigin
 import org.springframework.web.bind.annotation.GetMapping
@@ -20,7 +24,6 @@ import org.springframework.web.bind.annotation.RestController
  *@description
  **/
 
-
 @CrossOrigin("*")
 @RestController
 class UserController {
@@ -28,12 +31,22 @@ class UserController {
     @Autowired
     lateinit var userService: UserService
 
-    @GetMapping("/verify")
-    fun verify(@RequestBody accessKey: String): ResultInfo {
+    /*
+     * 验证accessKey是否有效 若有效返回token（6h有效期）
+     */
+    @PostMapping("/user/verify")
+    fun verify(@RequestBody accessKeyDTO: AccessKeyDTO): ResultInfo {
 
-        val token = userService.verify(accessKey)
+        val token = userService.verify(accessKeyDTO.accessKey)
+        if (token == "-1") return ResultInfo.unauthorized(message = "Invalid accessKey")
 
-        return ResultInfo.success(data = "success")
+        return ResultInfo.success(data = token)
+    }
+
+    @PostMapping("/user/addUser")
+    fun addUser(@RequestBody user: UserDTO): ResultInfo {
+        userService.addUser(user)
+        return ResultInfo.success(data = user)
     }
 
 }

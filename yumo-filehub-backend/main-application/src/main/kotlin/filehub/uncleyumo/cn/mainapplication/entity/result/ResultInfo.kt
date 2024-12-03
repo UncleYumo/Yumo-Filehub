@@ -20,6 +20,7 @@ class ResultInfo (
     companion object {
         private const val SUCCESS_CODE = 200
         private const val ERROR_CODE = 400
+        private const val EXCEPTION_CODE = 500
         private const val UNAUTHORIZED_CODE = 401
 
         fun success(data: Any? = null, message: String = "success"): ResultInfo {
@@ -28,6 +29,10 @@ class ResultInfo (
 
         fun error(data: Any? = null, message: String = "error"): ResultInfo {
             return createResult(ERROR_CODE, message, data)
+        }
+
+        fun exception(data: Any? = null, message: String = "exception"): ResultInfo {
+            return createResult(EXCEPTION_CODE, message, data)
         }
 
         fun unauthorized(data: Any? = null, message: String = "unauthorized"): ResultInfo {

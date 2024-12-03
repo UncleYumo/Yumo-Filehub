@@ -11,6 +11,6 @@ package filehub.uncleyumo.cn.mainapplication.utils
  *@description
  **/
 
-class FileManipulationUtils {
+class RedisManipulationUtil {
 
 }

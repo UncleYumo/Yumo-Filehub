@@ -1,8 +1,8 @@
-package filehub.uncleyumo.cn.mainapplication.tasks
+package filehub.uncleyumo.cn.mainapplication.utils
 
 /**
  *@author uncle_yumo
- *@fileName TimedTask
+ *@fileName FileManipulationUtils
  *@proName yumo-filehub-backend
  *@school Wuxi_University
  *@stuNumber 22344131
@@ -11,6 +11,6 @@ package filehub.uncleyumo.cn.mainapplication.tasks
  *@description
  **/
 
-class TimedTask {
+class FileManipulationUtil {
 
 }

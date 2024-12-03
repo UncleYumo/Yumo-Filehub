@@ -1,5 +1,6 @@
 package filehub.uncleyumo.cn.mainapplication.service
 
+import filehub.uncleyumo.cn.mainapplication.entity.pojo.UserDTO
 import org.springframework.stereotype.Service
 
 /**
@@ -15,8 +16,7 @@ import org.springframework.stereotype.Service
 
 @Service
 interface UserService {
-    fun verify(accessKey: String): String {
+    fun verify(accessKey: String): String
 
-        return TODO("Provide the return value")
-    }
+    fun addUser(user: UserDTO)
 }
