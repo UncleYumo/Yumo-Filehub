@@ -26,5 +26,10 @@ data class UserDTO(
     /*
      * 有效时间，单位：分钟
      */
-    val validTime: Int = 5
+    val validTime: Int = 5,
+
+    /*
+     * 用户剩余容量
+     */
+    var availableSpace: Int = 200 // 单位：MB
 )
