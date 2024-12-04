@@ -23,4 +23,6 @@ interface UserService {
     fun getUserList(): List<UserDTO>
 
     fun getAvailableSpace(): Int
+
+    fun deleteUser(accessKey: String)
 }

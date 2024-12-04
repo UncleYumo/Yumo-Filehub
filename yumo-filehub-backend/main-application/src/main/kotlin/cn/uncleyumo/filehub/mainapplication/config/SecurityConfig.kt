@@ -24,7 +24,7 @@ class SecurityConfig: WebMvcConfigurer {
     override fun addInterceptors(registry: InterceptorRegistry) {
         registry.addInterceptor(interceptor)
             .excludePathPatterns(
-                "/user/verify", "/user/test", "/user/addUser", "/file/download"
+                "/user/verify", "/user/test", "/user/addUser", "/user/deleteUser" , "/user/userList", "/file/download"
             )
     }
 

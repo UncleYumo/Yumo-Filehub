@@ -10,6 +10,7 @@ import jakarta.validation.Valid
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.web.bind.annotation.CrossOrigin
+import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -72,6 +73,13 @@ class UserController {
     @GetMapping("/availableSpace")
     fun getAvailableSpace(): ResultInfo {
         return ResultInfo.success(data = userService.getAvailableSpace())
+    }
+
+    @DeleteMapping("/deleteUser")
+    fun deleteUser(@RequestHeader("PRIVATE-KEY") privateKey: String, @RequestBody user: UserDTO): ResultInfo {
+        if (privateKey != PRIVATEKEY) return ResultInfo.unauthorized(message = "You are not authorized to delete user")
+        userService.deleteUser(user.accessKey)
+        return ResultInfo.success(data = "User deleted successfully")
     }
 
 }

@@ -1,11 +1,13 @@
 package cn.uncleyumo.filehub.mainapplication.service.impl
 
+import cn.uncleyumo.filehub.mainapplication.entity.pojo.FileDTO
 import cn.uncleyumo.filehub.mainapplication.entity.pojo.UserDTO
 import cn.uncleyumo.filehub.mainapplication.service.UserService
 import cn.uncleyumo.filehub.mainapplication.utils.FileManipulationUtil
 import cn.uncleyumo.filehub.mainapplication.utils.JwtUtil
 import cn.uncleyumo.filehub.mainapplication.utils.ThreadLocalUtil
 import cn.uncleyumo.utils.ColorPrinter
+import cn.uncleyumo.utils.LogPrinter
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.data.redis.core.RedisTemplate
@@ -28,6 +30,9 @@ class UserServiceImpl : UserService {
 
     @Autowired
     lateinit var userRedisTemplate: RedisTemplate<String, UserDTO>
+
+    @Autowired
+    lateinit var fileRedisTemplate: RedisTemplate<String, FileDTO>
 
     @Autowired
     private lateinit var fileManipulationUtil: FileManipulationUtil
@@ -84,6 +89,26 @@ class UserServiceImpl : UserService {
 
         // 返回剩余空间(KB)
         return userDTO.availableSpace - fileDirectorySize
+    }
+
+    override fun deleteUser(accessKey: String) {
+        // 删除Redis中用户信息
+        userRedisTemplate.delete("access-key:$accessKey")
+
+        // 删除用户文件目录
+        fileManipulationUtil.deleteDirectory(accessKey)
+
+        // 删除Redis中用户文件记录
+        val fileList: List<FileDTO> = fileRedisTemplate.keys("file:${accessKey}:*").mapNotNull {
+            fileRedisTemplate.opsForValue().get(it)
+        }
+
+        fileList.forEach {
+            fileRedisTemplate.delete("file:${accessKey}:${it.uuidFileName}")
+            LogPrinter.info("Delete file: 'file:${accessKey}:${it.uuidFileName}' successfully")
+        }
+
+        LogPrinter.error("Delete user: $accessKey and its files successfully")
     }
 
 }

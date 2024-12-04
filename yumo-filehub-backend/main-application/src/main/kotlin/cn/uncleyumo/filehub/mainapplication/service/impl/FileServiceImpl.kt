@@ -51,6 +51,17 @@ class FileServiceImpl : FileService {
         val claims: Map<String, *>? = ThreadLocalUtil.get()
         val accessKey: String = claims?.get("accessKey") as String
 
+        // 从Redis中获取用户的账户有效期剩余时间（秒）
+        val accountValidSeconds: Long = userRedisTemplate.getExpire("access-key:${accessKey}", TimeUnit.SECONDS)
+
+        // 将账户有效期剩余时间转换为分钟并舍去秒的精度
+        val accountValidMinutes = (accountValidSeconds / 60).toInt()
+
+        // 检查用户账户有效时间与文件有效时间是否冲突 如文件有效期大于用户有效期，则抛出异常
+        if (accountValidSeconds != -1L && validTime > accountValidMinutes && validTime!= -1) {
+            throw IllegalArgumentException("File valid time cannot exceed account valid time")
+        }
+
         // 检查当前用户文件容量是否超出限制(小于1GB)  单位：KB
         val fileDirectorySize: Int = fileManipulationUtil.getFileDirectorySize(accessKey)
         ColorPrinter.printlnCyanRed("Current file directory size: $fileDirectorySize KB")
