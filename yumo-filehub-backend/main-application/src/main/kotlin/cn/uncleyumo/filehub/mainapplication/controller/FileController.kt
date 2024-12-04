@@ -29,7 +29,7 @@ class FileController {
         @RequestParam("file") multipartFile: MultipartFile,
         @RequestParam("validTime") validTime: Int
     ): ResultInfo {
-
+        ColorPrinter.printlnCyanRed("uploadFile: $multipartFile, $validTime")
         val fileURL: String = fileService.uploadFile(multipartFile, validTime)
 
         return ResultInfo.success(data = fileURL)
@@ -62,5 +62,15 @@ class FileController {
         }
     }
 
+    @GetMapping("/fileList")
+    fun fileList(): ResultInfo {
+        return ResultInfo.success(data = fileService.getFileList())
+    }
+
+    @DeleteMapping("/delete")
+    fun deleteFile(@RequestParam("uuidFileName") uuidFileName: String): ResultInfo {
+        fileService.deleteFile(uuidFileName)
+        return ResultInfo.success()
+    }
 
 }

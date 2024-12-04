@@ -14,7 +14,6 @@ import java.util.*
 
 class FileLinkUtils {
     companion object {
-
         private const val BASE_URL = "http://localhost:49153/file/download"
         fun generateEncryptedFileLink(accessKey: String, uuidFileName: String): String {
             val encryptedAccessKey = AccessKeyUtil.encrypt(accessKey)

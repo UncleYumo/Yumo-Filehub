@@ -1,13 +1,15 @@
 package cn.uncleyumo.filehub.mainapplication.config
 
-//import filehub.uncleyumo.cn.mainapplication.job.TestJob
+import cn.uncleyumo.filehub.mainapplication.job.FileCleanJob
 import org.quartz.CronScheduleBuilder
 import org.quartz.JobBuilder
 import org.quartz.JobDetail
 import org.quartz.Trigger
 import org.quartz.TriggerBuilder
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import java.util.*
 
 /**
  * @author uncle_yumo
@@ -18,26 +20,29 @@ import org.springframework.context.annotation.Configuration
  * @description
  */
 
-//@Configuration  // Declare as a Spring configuration
+@Configuration  // Declare as a Spring configuration
 class QuartzConfig {
 
-//    @Bean
-//    fun jobDetail(): JobDetail {
-//        return JobBuilder.newJob(TestJob::class.java)
-//            .storeDurably()  // 持久化
-//            .withIdentity("testJob", "testGroup")  // 定义job的名称和组： 唯一标识
-//            .usingJobData("count", 0)  // 共享数据的初始化
-//            .build()
-//    }
+    @Value("\${quartz.jobs.file-clean-job.name}")
+    private lateinit var jobName: String
 
-//    @Bean
-//    fun trigger(): Trigger {
-//        return TriggerBuilder.newTrigger()
-//            .forJob(jobDetail())  // 定义trigger关联的job
-//            // Cron表达式： 秒 分 时 日 月 周 年
-//            .withSchedule(CronScheduleBuilder.cronSchedule("0/4 * * * * ?"))  // 每隔2秒执行一次
-////            .withSchedule(CronScheduleBuilder.cronSchedule("0 0 6,12,18,0 * * ?"))
-//            .withIdentity("testTrigger", "testGroup")  // 定义trigger的名称和组： 唯一标识
-//            .build()
-//    }
+    @Value("\${quartz.jobs.file-clean-job.cron}")  // cron: "* 0/1 * * * ?"
+    private lateinit var cron: String
+
+    @Bean
+    fun jobDetail(): JobDetail {
+        return JobBuilder.newJob(FileCleanJob::class.java)
+            .withIdentity(jobName)
+            .storeDurably()  // 任务持久化
+            .build()
+    }
+
+    @Bean
+    fun trigger(): Trigger {
+        return TriggerBuilder.newTrigger()
+            .forJob(jobDetail())  // 定义trigger关联的job
+//            .startAt(Date(System.currentTimeMillis() + 3000))  // 任务延迟3秒启动
+            .withSchedule(CronScheduleBuilder.cronSchedule(cron))
+            .build()
+    }
 }

@@ -30,7 +30,8 @@ class UserServiceImpl : UserService {
      * 验证accessKey是否有效 返回token
      */
     override fun verify(accessKey: String): String {
-        val user: UserDTO = userRedisTemplate.opsForValue().get("access-key:$accessKey") ?: throw Exception("Invalid accessKey")
+        val user: UserDTO =
+            userRedisTemplate.opsForValue().get("access-key:$accessKey") ?: throw Exception("Invalid accessKey")
         val map = mapOf<String, Any>("accessKey" to accessKey)
         return JwtUtil.generateToken(map)
     }
@@ -42,9 +43,7 @@ class UserServiceImpl : UserService {
                 "access-key:${user.accessKey}", user  // 设置过期时间为永久
             )
             return
-        }
-
-        if (user.validTime > 0) {
+        } else if (user.validTime > 0) {
             val expireTime: Long = user.validTime.toLong() * 60  // 过期时间单位为秒 传入的单位为分钟
             userRedisTemplate.opsForValue().set(
                 "access-key:${user.accessKey}",
@@ -52,7 +51,16 @@ class UserServiceImpl : UserService {
                 expireTime,
                 TimeUnit.SECONDS
             )
+        } else {
+            throw Exception("Invalid validTime must be greater than 0 or -1")
         }
 
     }
+
+    override fun getUserList(): List<UserDTO> {
+        return userRedisTemplate.keys("access-key:*").mapNotNull {
+            userRedisTemplate.opsForValue().get(it)
+        }
+    }
+
 }

@@ -1,5 +1,6 @@
 package cn.uncleyumo.filehub.mainapplication.service
 
+import cn.uncleyumo.filehub.mainapplication.entity.pojo.FileDTO
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
 import java.io.File
@@ -21,4 +22,8 @@ interface FileService {
     fun uploadFile(file: MultipartFile, validTime: Int): String
 
     fun downloadFile(encryptedAccessKey: String, uuidFileName: String): File?
+
+    fun getFileList(): List<FileDTO>
+
+    fun deleteFile(uuidFileName: String)
 }

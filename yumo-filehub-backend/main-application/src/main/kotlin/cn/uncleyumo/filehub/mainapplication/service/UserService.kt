@@ -19,4 +19,6 @@ interface UserService {
     fun verify(accessKey: String): String
 
     fun addUser(user: UserDTO)
+
+    fun getUserList(): List<UserDTO>
 }

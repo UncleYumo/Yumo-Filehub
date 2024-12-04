@@ -8,6 +8,7 @@ import cn.uncleyumo.filehub.mainapplication.utils.AccessKeyUtil
 import cn.uncleyumo.utils.ColorPrinter
 import jakarta.validation.Valid
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.web.bind.annotation.CrossOrigin
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
@@ -35,6 +36,9 @@ class UserController {
     @Autowired
     lateinit var userService: UserService
 
+    @Value("\${yumo-filehub.config.private-key}")
+    private lateinit var PRIVATEKEY: String
+
     /*
      * 验证accessKey是否有效 若有效返回token（6h有效期）
      */
@@ -52,10 +56,17 @@ class UserController {
 
     @PostMapping("/addUser")
     fun addUser(@RequestBody user: UserDTO, @RequestHeader("PRIVATE-KEY") privateKey: String): ResultInfo {
-//        ColorPrinter.printlnCyanRed("privateKey: $privateKey")
-        if (privateKey != "uncleyumo") return ResultInfo.unauthorized(message = "You are not authorized to add user")
+
+        if (privateKey != PRIVATEKEY) return ResultInfo.unauthorized(message = "You are not authorized to add user")
         userService.addUser(user)
         return ResultInfo.success(data = user)
+    }
+
+    @GetMapping("/userList")
+    fun getUserList(@RequestHeader("PRIVATE-KEY") privateKey: String): ResultInfo {
+
+        if (privateKey != PRIVATEKEY) return ResultInfo.unauthorized(message = "You are not authorized to get user list")
+        return  ResultInfo.success(data = userService.getUserList())
     }
 
 }

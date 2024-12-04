@@ -78,12 +78,31 @@ class FileManipulationUtil {
     /**
      * 获取文件目录大小
      * @param accessKey 子文件夹名称
-     * @return 目录大小
+     * @return 目录大小 单位：KB
      */
-    fun getFileDirectorySize(accessKey: String): Long {
+    fun getFileDirectorySize(accessKey: String): Int {
+        // 定义文件目录
         val directory = File(rootLocation, accessKey)
-        return if (directory.isDirectory) directory.walk().sumOf { it.length() } else 0L
+
+        // 如果目录不存在，尝试创建它
+        if (!directory.exists()) {
+            if (!directory.mkdirs()) {
+                throw IllegalArgumentException("Failed to create directory: $accessKey")
+            }
+        }
+
+        // 确保目录存在，从而可以安全地计算文件大小
+        if (directory.isDirectory) {
+            return try {
+                directory.walk().sumOf { it.length().toInt() } / 1024
+            } catch (e: Exception) {
+                throw RuntimeException("Error occurred while calculating directory size: ${e.message}", e)
+            }
+        } else {
+            throw IllegalArgumentException("Path is not a directory: $accessKey")
+        }
     }
+
 
     /**
      * 获取文件名列表
@@ -94,4 +113,40 @@ class FileManipulationUtil {
         val directory = File(rootLocation, accessKey)
         return if (directory.isDirectory) directory.list()?.toList() else null
     }
+
+    /**
+     * 获取本地文件列表
+     * @param accessKey 子文件夹名称
+     * @return 文件名列表
+     */
+    fun getLocalUUIDFileNameList(accessKey: String): List<String> {
+        val directory = File(rootLocation, accessKey)
+
+        // 如果目录不存在，尝试创建它
+        if (!directory.exists()) {
+            if (!directory.mkdirs()) {
+                return emptyList() // 如果创建目录失败，则返回空列表
+            }
+        }
+
+        // 返回所属目录（accessKey）下所有文件名（uuidFileName）
+        return if (directory.isDirectory) directory.list()?.toList() ?: emptyList() else emptyList()
+    }
+
+    fun getLocalAccessKeyList(): List<String> {
+        // 返回所有子文件夹名称（表示的就是accessKey）
+        return rootLocation.listFiles()
+            ?.filter { it.isDirectory }
+            ?.map { it.name }
+            ?: emptyList()
+    }
+
+    fun deleteDirectory(accessKey: String) {
+        // 删除accessKey对应的目录及其所有文件
+        val directory = File(rootLocation, accessKey)
+        if (directory.exists()) {
+            directory.deleteRecursively()
+        }
+    }
+
 }
