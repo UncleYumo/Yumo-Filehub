@@ -2,7 +2,10 @@ package cn.uncleyumo.filehub.mainapplication.service.impl
 
 import cn.uncleyumo.filehub.mainapplication.entity.pojo.UserDTO
 import cn.uncleyumo.filehub.mainapplication.service.UserService
+import cn.uncleyumo.filehub.mainapplication.utils.FileManipulationUtil
 import cn.uncleyumo.filehub.mainapplication.utils.JwtUtil
+import cn.uncleyumo.filehub.mainapplication.utils.ThreadLocalUtil
+import cn.uncleyumo.utils.ColorPrinter
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.data.redis.core.RedisTemplate
@@ -25,6 +28,9 @@ class UserServiceImpl : UserService {
 
     @Autowired
     lateinit var userRedisTemplate: RedisTemplate<String, UserDTO>
+
+    @Autowired
+    private lateinit var fileManipulationUtil: FileManipulationUtil
 
     /*
      * 验证accessKey是否有效 返回token
@@ -61,6 +67,23 @@ class UserServiceImpl : UserService {
         return userRedisTemplate.keys("access-key:*").mapNotNull {
             userRedisTemplate.opsForValue().get(it)
         }
+    }
+
+    override fun getAvailableSpace(): Int {
+        // 获取当前用户信息
+        val claims: Map<String, *>? = ThreadLocalUtil.get()
+        val accessKey: String = claims?.get("accessKey") as String
+
+        // 获取当前用户信息下的目录已使用空间(KB)
+        val fileDirectorySize: Int = fileManipulationUtil.getFileDirectorySize(accessKey)
+
+        ColorPrinter.printlnCyanRed("Current file directory size: $fileDirectorySize KB")
+
+        val userDTO: UserDTO = userRedisTemplate.opsForValue().get("access-key:${accessKey}")
+            ?: throw IllegalArgumentException("Invalid access key")
+
+        // 返回剩余空间(KB)
+        return userDTO.availableSpace - fileDirectorySize
     }
 
 }

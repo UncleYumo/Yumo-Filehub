@@ -21,4 +21,6 @@ interface UserService {
     fun addUser(user: UserDTO)
 
     fun getUserList(): List<UserDTO>
+
+    fun getAvailableSpace(): Int
 }

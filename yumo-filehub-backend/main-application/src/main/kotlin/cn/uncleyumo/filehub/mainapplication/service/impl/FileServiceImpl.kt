@@ -1,6 +1,7 @@
 package cn.uncleyumo.filehub.mainapplication.service.impl
 
 import cn.uncleyumo.filehub.mainapplication.entity.pojo.FileDTO
+import cn.uncleyumo.filehub.mainapplication.entity.pojo.UserDTO
 import cn.uncleyumo.filehub.mainapplication.service.FileService
 import cn.uncleyumo.filehub.mainapplication.utils.AccessKeyUtil
 import cn.uncleyumo.filehub.mainapplication.utils.FileLinkUtils
@@ -36,6 +37,9 @@ class FileServiceImpl : FileService {
     @Autowired
     private lateinit var fileRedisTemplate: RedisTemplate<String, FileDTO>
 
+    @Autowired
+    private lateinit var userRedisTemplate: RedisTemplate<String, UserDTO>
+
     override fun uploadFile(
         file: MultipartFile,
         validTime: Int
@@ -50,7 +54,11 @@ class FileServiceImpl : FileService {
         // 检查当前用户文件容量是否超出限制(小于1GB)  单位：KB
         val fileDirectorySize: Int = fileManipulationUtil.getFileDirectorySize(accessKey)
         ColorPrinter.printlnCyanRed("Current file directory size: $fileDirectorySize KB")
-        if (fileDirectorySize + file.size + 1024 > 1024 * 1024 * 1024)
+
+        val userDTO: UserDTO = userRedisTemplate.opsForValue().get("access-key:${accessKey}")
+            ?: throw IllegalArgumentException("Invalid access key")
+
+        if (fileDirectorySize + (file.size / 1024) + 1024 > userDTO.availableSpace)
             throw IllegalArgumentException("Your current file size exceeds the limit of 1GB")
 
         val fileName = file.originalFilename ?: "UnknownName"

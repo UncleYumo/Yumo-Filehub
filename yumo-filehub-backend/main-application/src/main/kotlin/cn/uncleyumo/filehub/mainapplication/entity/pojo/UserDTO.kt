@@ -31,5 +31,5 @@ data class UserDTO(
     /*
      * 用户剩余容量
      */
-    var availableSpace: Int = 2 * 1024 * 1024, // 单位：KB 默认2G
+    var availableSpace: Int = 1 * 1024 * 1024, // 单位：KB 默认2G
 )

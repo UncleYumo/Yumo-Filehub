@@ -69,4 +69,9 @@ class UserController {
         return  ResultInfo.success(data = userService.getUserList())
     }
 
+    @GetMapping("/availableSpace")
+    fun getAvailableSpace(): ResultInfo {
+        return ResultInfo.success(data = userService.getAvailableSpace())
+    }
+
 }
