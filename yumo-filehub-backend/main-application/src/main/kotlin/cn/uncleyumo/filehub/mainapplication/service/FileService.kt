@@ -2,6 +2,7 @@ package cn.uncleyumo.filehub.mainapplication.service
 
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
+import java.io.File
 
 /**
  *@author uncle_yumo
@@ -16,5 +17,8 @@ import org.springframework.web.multipart.MultipartFile
 
 @Service
 interface FileService {
+
     fun uploadFile(file: MultipartFile, validTime: Int): String
+
+    fun downloadFile(encryptedAccessKey: String, uuidFileName: String): File?
 }

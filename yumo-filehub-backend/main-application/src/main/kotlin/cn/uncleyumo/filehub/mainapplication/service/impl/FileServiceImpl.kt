@@ -2,6 +2,7 @@ package cn.uncleyumo.filehub.mainapplication.service.impl
 
 import cn.uncleyumo.filehub.mainapplication.entity.pojo.FileDTO
 import cn.uncleyumo.filehub.mainapplication.service.FileService
+import cn.uncleyumo.filehub.mainapplication.utils.AccessKeyUtil
 import cn.uncleyumo.filehub.mainapplication.utils.FileLinkUtils
 import cn.uncleyumo.filehub.mainapplication.utils.FileManipulationUtil
 import cn.uncleyumo.filehub.mainapplication.utils.ThreadLocalUtil
@@ -9,6 +10,7 @@ import cn.uncleyumo.utils.ColorPrinter
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
+import java.io.File
 import java.time.LocalDateTime
 
 /**
@@ -44,8 +46,14 @@ class FileServiceImpl: FileService {
             createTime = LocalDateTime.now(),
             validTime = validTime
         )
-        ColorPrinter.printlnCyanBlack("File uploaded successfully: \n$fileDTO")
+//        ColorPrinter.printlnCyanBlack("File uploaded successfully: \n$fileDTO")
         return fileDTO.fileUrl
+    }
+
+    override fun downloadFile(encryptedAccessKey: String, uuidFileName: String): File? {
+
+        val accessKey: String = AccessKeyUtil.decrypt(encryptedAccessKey)
+        return fileManipulationUtil.getFile(accessKey, uuidFileName)
     }
 
 

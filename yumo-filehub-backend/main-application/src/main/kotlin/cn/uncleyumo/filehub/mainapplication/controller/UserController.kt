@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.CrossOrigin
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
@@ -50,7 +51,9 @@ class UserController {
     }
 
     @PostMapping("/addUser")
-    fun addUser(@RequestBody user: UserDTO): ResultInfo {
+    fun addUser(@RequestBody user: UserDTO, @RequestHeader("PRIVATE-KEY") privateKey: String): ResultInfo {
+//        ColorPrinter.printlnCyanRed("privateKey: $privateKey")
+        if (privateKey != "uncleyumo") return ResultInfo.unauthorized(message = "You are not authorized to add user")
         userService.addUser(user)
         return ResultInfo.success(data = user)
     }

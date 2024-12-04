@@ -59,20 +59,20 @@ class FileManipulationUtil {
     /**
      * 获取文件
      * @param accessKey 子文件夹名称
-     * @param fileName 文件名
+     * @param uuidFileName 文件名
      * @return 文件对象
      */
-    fun getFile(accessKey: String, fileName: String): File? {
-        return File(rootLocation, "$accessKey/$fileName").takeIf { it.exists() }
+    fun getFile(accessKey: String, uuidFileName: String): File? {
+        return File(rootLocation, "$accessKey/$uuidFileName").takeIf { it.exists() }
     }
 
     /**
      * 删除文件
      * @param accessKey 子文件夹名称
-     * @param fileName 文件名
+     * @param uuidFileName 文件名
      */
-    fun deleteFile(accessKey: String, fileName: String) {
-        File(rootLocation, "$accessKey/$fileName").delete()
+    fun deleteFile(accessKey: String, uuidFileName: String) {
+        File(rootLocation, "$accessKey/$uuidFileName").delete()
     }
 
     /**
@@ -90,7 +90,7 @@ class FileManipulationUtil {
      * @param accessKey 子文件夹名称
      * @return 文件名列表
      */
-    fun getAccessKeyFileNameList(accessKey: String): List<String>? {
+    fun getAccessKeyUUIDFileNameList(accessKey: String): List<String>? {
         val directory = File(rootLocation, accessKey)
         return if (directory.isDirectory) directory.list()?.toList() else null
     }

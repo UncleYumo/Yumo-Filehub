@@ -30,7 +30,7 @@ class UserServiceImpl : UserService {
      * 验证accessKey是否有效 返回token
      */
     override fun verify(accessKey: String): String {
-        val user = userRedisTemplate.opsForValue().get("access-key:$accessKey")
+        val user: UserDTO = userRedisTemplate.opsForValue().get("access-key:$accessKey") ?: throw Exception("Invalid accessKey")
         val map = mapOf<String, Any>("accessKey" to accessKey)
         return JwtUtil.generateToken(map)
     }
