@@ -21,5 +21,5 @@ export const useTokenStore = defineStore('token', () => {
         removeToken
     }
 }, {
-    persist: true, // 持久化存储
+    // persist: true, // 持久化存储
 })

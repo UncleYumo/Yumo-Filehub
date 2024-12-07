@@ -1,9 +1,11 @@
 package cn.uncleyumo.filehub.mainapplication
 
+//import cn.uncleyumo.filehub.mainapplication.entity.pojo.ConstructionTest
 import cn.uncleyumo.filehub.mainapplication.utils.AccessKeyUtil
 import cn.uncleyumo.filehub.mainapplication.utils.JwtUtil
 import cn.uncleyumo.utils.ColorPrinter
 import cn.uncleyumo.utils.LogPrinter
+import cn.uncleyumo.utils.enum.QuickTemplateEnum
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.context.SpringBootTest
 
@@ -44,6 +46,22 @@ class MainApplicationTests {
         } else {
             ColorPrinter.printlnCyanRed("invalid accessKey format")
         }
+    }
+
+    @Test
+    fun testConstructorTest() {
+//        val constructorTest = ConstructionTest(
+//            "test",
+//            "model",
+//            2014,
+//            9999
+//        )
+//        ColorPrinter.printlnCyanRed(constructorTest.toString())
+//        ColorPrinter.printlnCyanBlack(constructorTest.name)
+//        ColorPrinter.printlnCyanBlack(constructorTest.model)
+
+        QuickTemplateEnum.VERSION_INFO.println()
+        QuickTemplateEnum.PROGRAM_VERSION.showProgramInfo()
     }
 
 }

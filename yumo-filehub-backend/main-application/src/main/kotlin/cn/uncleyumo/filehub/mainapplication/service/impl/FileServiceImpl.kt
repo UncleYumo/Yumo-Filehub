@@ -58,7 +58,7 @@ class FileServiceImpl : FileService {
         val accountValidMinutes = (accountValidSeconds / 60).toInt()
 
         // 检查用户账户有效时间与文件有效时间是否冲突 如文件有效期大于用户有效期，则抛出异常
-        if (accountValidSeconds != -1L && validTime > accountValidMinutes && validTime!= -1) {
+        if ((accountValidSeconds != -1L && validTime > accountValidMinutes && validTime != -1) || (validTime == -1 && accountValidSeconds != -1L)) {
             throw IllegalArgumentException("File valid time cannot exceed account valid time")
         }
 
@@ -69,8 +69,8 @@ class FileServiceImpl : FileService {
         val userDTO: UserDTO = userRedisTemplate.opsForValue().get("access-key:${accessKey}")
             ?: throw IllegalArgumentException("Invalid access key")
 
-        if (fileDirectorySize + (file.size / 1024) + 1024 > userDTO.availableSpace)
-            throw IllegalArgumentException("Your current file size exceeds the limit of 1GB")
+        if (fileDirectorySize + (file.size / 1024) > userDTO.availableSpace)
+            throw IllegalArgumentException("Your current file size exceeds the limit of ${userDTO.availableSpace - fileDirectorySize} KB")
 
         val fileName = file.originalFilename ?: "UnknownName"
         val uuidFileName = FileLinkUtils.generateUUIDFileName(FileLinkUtils.getFileType(fileName))

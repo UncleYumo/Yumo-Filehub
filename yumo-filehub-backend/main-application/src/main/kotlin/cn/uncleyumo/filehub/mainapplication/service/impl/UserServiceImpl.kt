@@ -9,7 +9,6 @@ import cn.uncleyumo.filehub.mainapplication.utils.ThreadLocalUtil
 import cn.uncleyumo.utils.ColorPrinter
 import cn.uncleyumo.utils.LogPrinter
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.stereotype.Service
 import java.util.concurrent.TimeUnit
@@ -109,6 +108,14 @@ class UserServiceImpl : UserService {
         }
 
         LogPrinter.error("Delete user: $accessKey and its files successfully")
+    }
+
+    override fun getValidTime(): Int {
+        // 获取当前用户信息
+        val claims: Map<String, *>? = ThreadLocalUtil.get()
+        val accessKey: String = claims?.get("accessKey") as String
+
+        return userRedisTemplate.getExpire("access-key:${accessKey}").toInt()
     }
 
 }

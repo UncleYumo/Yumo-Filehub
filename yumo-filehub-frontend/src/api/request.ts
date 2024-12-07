@@ -1,42 +1,74 @@
-import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
-import { ResultData } from './types';
+import axios from "axios";  // 引入axios库的类型定义
+import type {AxiosInstance, AxiosRequestConfig, AxiosResponse} from "axios"
+import {useTokenStore} from "@/stores/tokenStore";
+import { ElMessage } from 'element-plus'
+import router from "@/router";
 
-const service: AxiosInstance = axios.create({
-    baseURL: 'http://localhost:49153/api',
-    timeout: 5000,
-});
+const VUE_DEV_BASE_URL: string = 'http://localhost:49153'
+const VUE_RELEASE_BASE_URL: string = 'https://139.224.195.43/filehub'
+const baseURL = VUE_DEV_BASE_URL
+
+const instance: AxiosInstance = axios.create({baseURL})
 
 // 请求拦截器
-service.interceptors.request.use(
-    (config: AxiosRequestConfig): AxiosRequestConfig => {
-        const token = userStore.token;
-        if (token) {
-            config.headers!['Authorization'] = `Bearer ${token}`;
+instance.interceptors.request.use(
+    (config) => {
+        // 添加token
+        const tokenStore = useTokenStore()
+        if ( tokenStore.token !== '' && tokenStore.token !== null ) {
+            // console.log('Add token:', tokenStore.token)
+            config.headers.Authorization = `Bearer ${tokenStore.token}`
         }
-        return config;
+        return config
     },
     (error) => {
-        console.error('请求错误:', error);
-        return Promise.reject(error);
+        return Promise.reject(error)
     }
-);
+)
 
 // 响应拦截器
-service.interceptors.response.use(
-    (response: AxiosResponse<ResultData<any>>) => response.data,
-    (error) => {
-        if (error.response) {
-            if (error.response.status === 401) {
-                // 假设你有路由功能，例如使用vue-router
-                router.push('/authorize');
-            } else {
-                console.error('响应错误:', error.response.status, error.response.data);
-            }
-        } else {
-            console.error('网络错误:', error);
-        }
-        return Promise.reject(error);
-    }
-);
+instance.interceptors.response.use(
+    async result => {
+        let code = result.data.code
+        if (code === 200) {  // 成功
+            return result.data
+        } else if (code === 401) {  // 未登录
 
-export default service;
+            ElMessage({
+                showClose: true,
+                message: 'Authorization failed, please verify your Access-Key',
+                type: 'error',
+            })
+
+            // 清空本地token
+            const tokenStore = useTokenStore()
+            tokenStore.removeToken()
+            await router.push('/authorize')
+
+        } else if (code === 400) {
+            ElMessage({
+                showClose: true,
+                message: result.data.message,
+                type: 'error',
+            })
+            return Promise.reject(result.data)
+        } else if (code === 500) {
+            ElMessage({
+                showClose: true,
+                message: result.data.message,
+                type: 'error',
+            })
+            return Promise.reject(result.data)
+        }
+    },
+    error => {
+        ElMessage({
+            showClose: true,
+            message: 'Network Error',
+            type: 'error',
+        })
+        return Promise.reject(error)
+    }
+)
+
+export default instance

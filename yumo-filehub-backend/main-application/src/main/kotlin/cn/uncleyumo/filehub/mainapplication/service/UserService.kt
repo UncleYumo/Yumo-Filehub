@@ -25,4 +25,6 @@ interface UserService {
     fun getAvailableSpace(): Int
 
     fun deleteUser(accessKey: String)
+
+    fun getValidTime(): Int
 }

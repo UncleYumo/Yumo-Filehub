@@ -28,12 +28,13 @@ class SecurityConfig: WebMvcConfigurer {
             )
     }
 
-    override fun addCorsMappings(registry: CorsRegistry) {
-        registry.addMapping("/**")  // allow all origins
-            .allowedOrigins("*")
-            .allowedMethods("*")
-            .allowedHeaders("*")
-            .allowCredentials(false)
-            .maxAge(3600)
-    }
+//    override fun addCorsMappings(registry: CorsRegistry) {
+//        registry.addMapping("/**")  // allow all origins
+////            .allowedOrigins("*")
+//            .allowedOriginPatterns("*")
+//            .allowedMethods("*")
+//            .allowedHeaders("*")
+//            .allowCredentials(false)
+//            .maxAge(3600)
+//    }
 }

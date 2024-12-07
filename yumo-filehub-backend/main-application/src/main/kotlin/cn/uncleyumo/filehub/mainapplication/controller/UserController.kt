@@ -82,4 +82,10 @@ class UserController {
         return ResultInfo.success(data = "User deleted successfully")
     }
 
+    @GetMapping("/validTime")
+    fun getValidTime(): ResultInfo {
+        val validTime: Int = userService.getValidTime() / 60
+        return ResultInfo.success(data = validTime)
+    }
+
 }

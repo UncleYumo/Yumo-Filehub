@@ -14,18 +14,23 @@
           <el-dropdown-menu>
 
             <el-dropdown-item @click="goToFileRetrieve()">
-              <n-icon size="28" :component="BookSearch24Filled"/>
-              <span style="font-size: 20px;">Retrieve History Files</span>
+              <n-icon size="24" :component="BookSearch24Filled"/>
+              <span style="font-size: 16px;">Retrieve history files</span>
             </el-dropdown-item>
 
             <el-dropdown-item @click="goToGithub()">
-              <n-icon size="28" :component="GithubOutlined"/>
-              <span style="font-size: 20px">To the Github Project Page</span>
+              <n-icon size="24" :component="GithubOutlined"/>
+              <span style="font-size: 16px">Go to github project page</span>
             </el-dropdown-item>
 
             <el-dropdown-item>
-              <n-icon size="28" :component="HelpCenterFilled"/>
-              <span style="font-size: 20px">How To Use Yumo FileHub</span>
+              <n-icon size="24" :component="QuestionCircle20Filled"/>
+              <span style="font-size: 16px">How to use fileHub?</span>
+            </el-dropdown-item>
+
+            <el-dropdown-item @click="logoutSystem()">
+              <n-icon size="24" :component="IosLogOut"/>
+              <span style="font-size: 16px;color: rgb(255,179,253)">Logout system</span>
             </el-dropdown-item>
 
           </el-dropdown-menu>
@@ -46,14 +51,16 @@
 
 
 <script setup lang="ts">
-import {onMounted, ref} from 'vue';
+import {onMounted, ref, nextTick} from 'vue';
 import {GithubOutlined} from '@vicons/antd';
-import {BookSearch24Filled} from '@vicons/fluent';
-import {HelpCenterFilled} from '@vicons/material';
+import {BookSearch24Filled, QuestionCircle20Filled} from '@vicons/fluent';
+import {IosLogOut} from '@vicons/ionicons4'
 import {useTokenStore} from "@/stores/tokenStore";
+import router from "@/router";
 
 import FileUpload from '../components/File-Upload-Page/FileUpload.vue'
 import ArrowCircleDown48Regular from '@vicons/fluent/ArrowCircleDown48Regular';
+import {ElMessage, ElMessageBox} from 'element-plus'
 
 const typing_slogan = ref(''); // 初始值
 
@@ -76,25 +83,48 @@ const typingEffect = async () => {
   }
 };
 
-onMounted(() => {
-  typingEffect();
-});
-
 const goToGithub = () => {
   window.open('https://github.com/UncleYumo/Yumo-FileHub', '_blank');
 };
 
 const goToFileRetrieve = () => {
-  window.location.href = '/retrieve';
+  router.push('/retrieve')
 };
 
 onMounted(() => {
-  let tokenStore = useTokenStore();
-  if (tokenStore.token === '') {
-    alert('You have to Verify your Access-Key Firstly!');
-    window.location.href = '/authorize';
-  }
+  // let tokenStore = useTokenStore()
+  // if (tokenStore.token === '') {
+  //   window.location.href = '/authorize'
+  // }
+  typingEffect();
 })
+
+const logoutSystem = () => {
+
+  ElMessageBox.confirm(
+      'Are you sure to log out the system?',
+      'Warning',
+      {
+        confirmButtonText: 'Yes',
+        cancelButtonText: 'Cancel',
+        type: 'warning',
+      })
+      .then(async () => {
+        ElMessage({
+          type: 'warning',
+          message: 'Confirm logout',
+        })
+        const tokenStore = useTokenStore()
+        tokenStore.removeToken()
+        await router.push('/authorize')
+      })
+      .catch(() => {
+        ElMessage({
+          type: 'info',
+          message: 'Logout canceled',
+        })
+      })
+}
 
 </script>
 

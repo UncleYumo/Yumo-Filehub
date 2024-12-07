@@ -32,19 +32,55 @@
 </template>
 
 <script setup lang="ts">
-import {ref} from "vue";
+import {onMounted, ref} from "vue";
 import {useTokenStore} from "@/stores/tokenStore";
+
+import {ElMessage} from "element-plus";
+import { ElLoading } from 'element-plus'
+
+import router from "@/router";
+import {verifyAccessKeyService} from "@/api/handleAccessKey";
 
 const tokenStore = useTokenStore();
 const accessKey = ref('');
 
-const validateAccessKey = () => {
-  alert("Access-Key: " + accessKey.value);
-  tokenStore.setToken(accessKey.value);
-  console.log(tokenStore.token);
-  window.location.href = "/";
+const validateAccessKey = async () => {
+  if (accessKey.value.length === 0) {
+    ElMessage({
+      message: 'Please enter your Access-Key first!',
+      type: 'warning',
+      plain: true,
+    })
+    return;
+  }
+
+  const loadingInstance = ElLoading.service({
+    text: 'Verifying Access-Key...',
+    background: 'rgba(0, 0, 0, 0.7)',
+    target: '.main-container',
+  })
+
+  try {
+    let resultData = await verifyAccessKeyService(accessKey.value)
+    loadingInstance.close()
+    const tokenStore = useTokenStore();
+    tokenStore.setToken(resultData.data);
+    ElMessage({
+      message: 'Access-Key verified successfully!',
+      type:'success',
+      duration: 1000,
+      plain: true,
+    })
+    await router.push('/');
+  } catch (error) {
+    loadingInstance.close()
+  }
+
 }
 
+onMounted(() => {
+  ElMessage.warning('Access-Key needs to be verified by the server.')
+})
 
 </script>
 

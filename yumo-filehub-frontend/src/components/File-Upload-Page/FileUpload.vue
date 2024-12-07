@@ -40,36 +40,123 @@
     </div>
   </div>
 
+  <el-dialog v-model="dialogFormVisible" title="File Upload Confirmation" width="400">
+    <el-row justify="center" align="middle">
+      <el-col :span="6">
+        <el-statistic title="Available(KB)" :value="availableSpace"/>
+      </el-col>
+      <el-col :span="6">
+        <el-statistic title="Max Time(M)" :value="userValidTime ? userValidTime : '∞'"/>
+      </el-col>
+      <el-col :span="6">
+        <el-statistic title="File Size(KB)" :value="currentFileSize"/>
+      </el-col>
+    </el-row>
+    <div style="margin-top: 10px;"></div>
+    <div class="slider-demo-block">
+      <span class="demonstration">File Valid Time</span>
+      <el-slider :min="sliderFileValidTimeMinValue" :max="sliderFileValidTimeMaxValue" show-input v-model="fileValidTime"/>
+    </div>
+    <template #footer>
+      <div class="dialog-footer">
+        <el-button @click="dialogFormVisible = false">Cancel</el-button>
+        <el-button type="primary" @click="handleUpload">
+          Confirm
+        </el-button>
+      </div>
+    </template>
+  </el-dialog>
+
+  <el-dialog v-model="dialogFileURLVisible" title="File URL" width="500" center>
+    <span style="margin-bottom: 16px; color: #ffffa6">
+      {{fileURL}}
+    </span>
+    <template #footer>
+      <div class="dialog-footer">
+        <el-button @click="dialogFileURLVisible = false">Cancel</el-button>
+        <el-button type="primary" @click="copyFileURL">
+          COPY URL
+        </el-button>
+      </div>
+    </template>
+  </el-dialog>
+
 </template>
 
 <script setup lang="ts">
 import {UploadFilled} from '@element-plus/icons-vue'
 import {ref, computed} from 'vue'
 import {UploadFileFilled} from '@vicons/material'
+
 import type {UploadInstance, UploadUserFile} from 'element-plus'
-import axios from 'axios'
+import {ElMessage} from "element-plus"
+import {ElLoading} from 'element-plus'
+
+import {fileUploadService} from "@/api/handleFile"
+import {userAvailableSpaceService, userValidTimeService} from "@/api/handleUser";
+import router from "@/router"
+import {useTokenStore} from "@/stores/tokenStore"
 
 const uploadRef = ref<UploadInstance>()  // 用于控制上传的引用
 const fileName = ref('No Selected File')
 const fileObject = ref()
+const fileValidTime = ref(1)  // 有效时间，单位为分钟
+const dialogFormVisible = ref(false)
+const availableSpace = ref(0)
+const currentFileSize = ref(0)
+const userValidTime = ref(0)
+const fileURL = ref('')
+const dialogFileURLVisible = ref(false)
+
+const sliderFileValidTimeMinValue = computed(() => {
+  if (userValidTime.value === 0) {
+    return -1 // 当用户没有有效时间时，最小值设为 -1
+  }
+  return 0
+});
+
+const sliderFileValidTimeMaxValue = computed(() => {
+  if (userValidTime.value === 0) {
+    return 99999; // 当用户没有有效时间时，最大值设为很大的数
+  }
+
+  if (userValidTime.value < 0 && userValidTime.value !== -1) {
+    ElMessage({
+      message: 'Current Access-Key has no more valid time left',
+      type: 'error',
+      plain: true,
+    });
+    const tokenStore = useTokenStore()
+    tokenStore.removeToken()
+    router.push('/authorize')
+  }
+  return userValidTime.value; // 返回用户有效时间
+});
 
 const isFileSelected = computed(() => {
   return fileName.value !== 'No Selected File'
 })
 
 const formattedFileName = computed(() => {
-  const maxLength = 36; // 设置最大字符长度
+  const maxLength = 36 // 设置最大字符长度
   return fileName.value.length > maxLength
       ? fileName.value.slice(0, maxLength) + '...(omitted)'
-      : fileName.value;
+      : fileName.value
 });
 
 const handFileChange = (file: File) => {
-  console.log("File Changed: " + file.name)
+  ElMessage({
+    message: 'File Selected',
+    type: 'success',
+    plain: true,
+  })
 
   if (file.size > 200 * 1024 * 1024) {
-    // TODO: Using Element-Plus's Dialog to show an alert
-    alert('File size should be less than 200MB')
+    ElMessage({
+      message: 'File size should be less than 200MB',
+      type: 'warning',
+      plain: true,
+    })
     return
   }
 
@@ -80,29 +167,22 @@ const handFileChange = (file: File) => {
 
 const submitFile = async () => {
   if (!isFileSelected.value) {
-    // TODO: Using Element-Plus's Dialog to show an alert
-    alert('Please select a file to upload')
+    ElMessage({
+      message: 'Please select a file to upload',
+      type: 'warning',
+      plain: true,
+    })
     return
   }
 
-  let formData = new FormData()
-  formData.append('file', fileObject.value.raw)
-  let utl = 'https://filehub.uncleyumo.cn/file/upload'
-  let method = 'post'
-  let headers = {
-    'Content-Type': 'multipart/form-data',
-    'Authorization': 'uncleyumo'
-  }
-  axios({
-    method: method,
-    url: utl,
-    data: formData,
-    headers: headers
-  }).then(res => {
-    console.log(res)
-  }).catch(err => {
-    console.log(err)
-  })
+  let result = await userAvailableSpaceService()
+  availableSpace.value = result.data // KB
+  currentFileSize.value = fileObject.value.size / 1024 // KB
+
+  let userValidTimeResult = await userValidTimeService()
+  userValidTime.value = userValidTimeResult.data
+
+  dialogFormVisible.value = true
 }
 
 const handleUploadClick = () => {
@@ -110,6 +190,54 @@ const handleUploadClick = () => {
   fileName.value = 'No Selected File'
   console.log('Upload Ref Cleared')
 }
+
+const handleUpload = async () => {
+  let formData = new FormData()
+  formData.append('file', fileObject.value.raw)
+  formData.append('validTime', fileValidTime.value.toString())
+
+  const loadingInstance = ElLoading.service({
+    text: 'Uploading file...',
+    background: 'rgba(0, 0, 0, 0.7)',
+    target: '.file-upload-container',
+  })
+
+  try {
+    let response = await fileUploadService(formData)
+    ElMessage({
+      message: "File uploaded successfully",
+      type: 'success',
+      plain: true,
+    })
+    loadingInstance.close()
+    dialogFormVisible.value = false
+    fileURL.value = response.data
+    dialogFileURLVisible.value = true
+  } catch (error) {
+    loadingInstance.close()
+  }
+}
+
+const copyFileURL = async () => {
+
+  try {
+    await navigator.clipboard.writeText(fileURL.value)
+    ElMessage({
+      message: 'File URL copied to clipboard',
+      type: 'success',
+      plain: true,
+    })
+  } catch (err) {
+    ElMessage({
+      message: 'Failed to copy file URL to clipboard',
+      type: 'error',
+      plain: true,
+    })
+  }
+
+
+}
+
 </script>
 
 
@@ -195,6 +323,9 @@ const handleUploadClick = () => {
       }
     }
   }
+  .el-col {
+    text-align: center;
+  }
 }
 
 // Tablet Screen's Sizes and Below
@@ -262,6 +393,9 @@ const handleUploadClick = () => {
         }
       }
     }
+  }
+  .el-col {
+    text-align: center;
   }
 }
 
@@ -354,7 +488,9 @@ const handleUploadClick = () => {
       }
     }
   }
-
+  .el-col {
+    text-align: center;
+  }
 }
 
 </style>

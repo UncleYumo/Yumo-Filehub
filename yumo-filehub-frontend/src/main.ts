@@ -1,10 +1,11 @@
 import { createApp } from 'vue';
-
 import { createPinia  } from 'pinia'
-import { createPersistedState } from 'pinia-plugin-persistedstate'
 
 import App from './App.vue';
 import router from './router';
+
+// @ts-ignore
+import { createPersistedState } from 'pinia-persistedstate-plugin'
 
 // ElementPlus
 import ElementPlus from 'element-plus';
@@ -21,6 +22,6 @@ const app = createApp(App);
 
 app.use(ElementPlus);
 app.use(naive);
-app.use(pinia); // 使用 Pinia 实例
 app.use(router);
+app.use(pinia); // 使用 Pinia 实例
 app.mount('#app');
