@@ -81,7 +81,7 @@ class UserServiceImpl : UserService {
         // 获取当前用户信息下的目录已使用空间(KB)
         val fileDirectorySize: Int = fileManipulationUtil.getFileDirectorySize(accessKey)
 
-        ColorPrinter.printlnCyanRed("Current file directory size: $fileDirectorySize KB")
+//        ColorPrinter.printlnCyanRed("Current file directory size: $fileDirectorySize KB")
 
         val userDTO: UserDTO = userRedisTemplate.opsForValue().get("access-key:${accessKey}")
             ?: throw IllegalArgumentException("Invalid access key")
@@ -104,10 +104,10 @@ class UserServiceImpl : UserService {
 
         fileList.forEach {
             fileRedisTemplate.delete("file:${accessKey}:${it.uuidFileName}")
-            LogPrinter.info("Delete file: 'file:${accessKey}:${it.uuidFileName}' successfully")
+//            LogPrinter.info("Delete file: 'file:${accessKey}:${it.uuidFileName}' successfully")
         }
 
-        LogPrinter.error("Delete user: $accessKey and its files successfully")
+//        LogPrinter.error("Delete user: $accessKey and its files successfully")
     }
 
     override fun getValidTime(): Int {

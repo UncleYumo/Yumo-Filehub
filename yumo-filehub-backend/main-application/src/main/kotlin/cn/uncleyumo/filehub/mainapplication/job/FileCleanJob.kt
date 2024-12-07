@@ -35,42 +35,40 @@ class FileCleanJob : Job {
     // TODO: 实现文件清理逻辑
     override fun execute(context: JobExecutionContext?) {
         val currentTimeMillis = System.currentTimeMillis()
-        LogPrinter.warn("FileCleanJob execute start\t\t>>>>>>>>>>>>>>>>>>>>")
+//        LogPrinter.warn("FileCleanJob execute start\t\t>>>>>>>>>>>>>>>>>>>>")
 
         // 获取所有用户列表
         val redisUserDTOList: List<UserDTO> = userRedisTemplate.keys("access-key:*").mapNotNull {
             userRedisTemplate.opsForValue().get(it)
         }.also {
-            LogPrinter.warn("RedisUserDTOList's length is ${it.size}")
+//            LogPrinter.warn("RedisUserDTOList's length is ${it.size}")
         }
 
         // 获取本地accessKey列表 即本地存在的用户目录
         val localAccessKeyList: List<String> = manipulationUtil.getLocalAccessKeyList()
-        LogPrinter.warn("LocalAccessKeyList's length is ${localAccessKeyList.size}")
+//        LogPrinter.warn("LocalAccessKeyList's length is ${localAccessKeyList.size}")
 
         // 遍历本地accessKey列表并与redis中用户列表进行比对
         for (localAccessKey in localAccessKeyList) {
-            ColorPrinter.printlnRedBlack("Current access key is $localAccessKey")
+//            ColorPrinter.printlnRedBlack("Current access key is $localAccessKey")
 
             if (redisUserDTOList.none { it.accessKey == localAccessKey }) {
                 // 本地accessKey不在redis中，则删除该目录及其下所有文件
                 manipulationUtil.deleteDirectory(localAccessKey)
-                LogPrinter.error("!!!!!!Delete directory $localAccessKey success")
+//                LogPrinter.error("!!!!!!Delete directory $localAccessKey success")
 
             } else {
                 // 该accessKey在redis中，则遍历该目录下所有文件并进行比对
-                ColorPrinter.printlnGreenBlack("Access key $localAccessKey is in Redis")
+//                ColorPrinter.printlnGreenBlack("Access key $localAccessKey is in Redis")
 
                 // 获取本地文件列表
                 val localFileUUIDNameList: List<String> = manipulationUtil.getLocalUUIDFileNameList(localAccessKey)
-                LogPrinter.warn("LocalFileUUIDNameList's length is ${localFileUUIDNameList.size}")
+//                LogPrinter.warn("LocalFileUUIDNameList's length is ${localFileUUIDNameList.size}")
 
                 // 获取redis文件列表
                 val redisFileDTOList: List<FileDTO> = fileRedisTemplate.keys("file:${localAccessKey}:*")
                     .mapNotNull {
                         fileRedisTemplate.opsForValue().get(it)
-                    }.also {
-                        LogPrinter.warn("RedisFileDTOList's length is ${it.size}")
                     }
 
                 // 遍历本地文件列表并与redis中文件列表进行比对
@@ -80,7 +78,7 @@ class FileCleanJob : Job {
                     if (redisFileDTO == null) {
                         // 无效文件则删除
                         manipulationUtil.deleteFile(localAccessKey, localFileUUIDName)
-                        LogPrinter.error("!!!!!!Delete file $localAccessKey:$localFileUUIDName success")
+//                        LogPrinter.error("!!!!!!Delete file $localAccessKey:$localFileUUIDName success")
                     }
                     println()
                 }
@@ -89,9 +87,9 @@ class FileCleanJob : Job {
         }
 
         val endTimeMillis = System.currentTimeMillis()
-        ColorPrinter.printlnGreenBlack("FileCleanJob execute time is ${endTimeMillis - currentTimeMillis} ms")
-        ColorPrinter.printlnGreenBlack("Next execute time is ${context?.nextFireTime}")
-        LogPrinter.warn("FileCleanJob execute end\t\t>>>>>>>>>>>>>>>>>>>>")
+//        ColorPrinter.printlnGreenBlack("FileCleanJob execute time is ${endTimeMillis - currentTimeMillis} ms")
+//        ColorPrinter.printlnGreenBlack("Next execute time is ${context?.nextFireTime}")
+//        LogPrinter.warn("FileCleanJob execute end\t\t>>>>>>>>>>>>>>>>>>>>")
 
     }
 

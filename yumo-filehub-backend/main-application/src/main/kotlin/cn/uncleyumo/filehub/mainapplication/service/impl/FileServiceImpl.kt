@@ -64,7 +64,7 @@ class FileServiceImpl : FileService {
 
         // 检查当前用户文件容量是否超出限制(小于1GB)  单位：KB
         val fileDirectorySize: Int = fileManipulationUtil.getFileDirectorySize(accessKey)
-        ColorPrinter.printlnCyanRed("Current file directory size: $fileDirectorySize KB")
+//        ColorPrinter.printlnCyanRed("Current file directory size: $fileDirectorySize KB")
 
         val userDTO: UserDTO = userRedisTemplate.opsForValue().get("access-key:${accessKey}")
             ?: throw IllegalArgumentException("Invalid access key")

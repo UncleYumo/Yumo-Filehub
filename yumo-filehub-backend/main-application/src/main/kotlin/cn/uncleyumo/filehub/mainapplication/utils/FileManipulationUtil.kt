@@ -1,9 +1,15 @@
 package cn.uncleyumo.filehub.mainapplication.utils
 
+import cn.uncleyumo.utils.ColorPrinter
 import org.springframework.core.io.ClassPathResource
 import org.springframework.stereotype.Component
 import org.springframework.web.multipart.MultipartFile
 import java.io.File
+import java.io.FileInputStream
+import java.io.FileOutputStream
+import java.io.IOException
+import java.nio.file.Files
+import java.nio.file.Paths
 
 /**
  * 文件操作工具类
@@ -21,11 +27,22 @@ import java.io.File
 @Component
 class FileManipulationUtil {
 
-    // 定义存储文件的根位置（使用ClassPathResource来获取资源文件目录）
-    val rootLocation: File = ClassPathResource("yumo-filehub-store").file.also {
-        if (!it.exists()) {
-            it.mkdirs() // 如果不存在，则创建目录
+
+    private val rootLocation: File = createTempDirectory()
+
+    private fun createTempDirectory(): File {
+        val tempDir = Files.createTempDirectory("yumo-filehub-store").toFile()
+        ColorPrinter.printlnCyanRed("创建临时文件目录: ${tempDir.absolutePath}")
+        tempDir.deleteOnExit() // JAR 运行结束时自动删除临时文件
+        return tempDir
+    }
+
+    private fun getRealFilePath(accessKey: String, uuidFileName: String): File {
+        val directory = File(rootLocation, accessKey)
+        if (!directory.exists()) {
+            directory.mkdirs()
         }
+        return File(directory, uuidFileName)
     }
 
     /**
@@ -34,8 +51,6 @@ class FileManipulationUtil {
      * @param file 文件对象
      */
     fun saveFile(accessKey: String, uuidFileName: String, file: MultipartFile): String {
-
-        // 防止文件名中有特殊字符
         if (file.originalFilename?.contains("/") == true) {
             throw IllegalArgumentException("File name cannot contain '/'")
         }
@@ -44,14 +59,12 @@ class FileManipulationUtil {
             throw IllegalArgumentException("File size cannot exceed 200MB")
         }
 
-        // 创建子文件夹
-        val directory = File(rootLocation, accessKey).also { if (!it.exists()) it.mkdirs() }
-
-        // 构建目标文件路径
-        val targetFile = File(directory, uuidFileName)
-
-        // 将上传的文件保存到目标位置
-        file.transferTo(targetFile)
+        val targetFile = getRealFilePath(accessKey, uuidFileName)
+        file.inputStream.use { inputStream ->
+            FileOutputStream(targetFile).use { outputStream ->
+                inputStream.copyTo(outputStream)
+            }
+        }
 
         return FileLinkUtils.generateEncryptedFileLink(accessKey, uuidFileName)
     }
@@ -63,7 +76,8 @@ class FileManipulationUtil {
      * @return 文件对象
      */
     fun getFile(accessKey: String, uuidFileName: String): File? {
-        return File(rootLocation, "$accessKey/$uuidFileName").takeIf { it.exists() }
+        val file = getRealFilePath(accessKey, uuidFileName)
+        return if (file.exists()) file else null
     }
 
     /**
@@ -72,7 +86,8 @@ class FileManipulationUtil {
      * @param uuidFileName 文件名
      */
     fun deleteFile(accessKey: String, uuidFileName: String) {
-        File(rootLocation, "$accessKey/$uuidFileName").delete()
+        val file = getRealFilePath(accessKey, uuidFileName)
+        file.delete()
     }
 
     /**
@@ -81,19 +96,15 @@ class FileManipulationUtil {
      * @return 目录大小 单位：KB
      */
     fun getFileDirectorySize(accessKey: String): Int {
-        // 定义文件目录
         val directory = File(rootLocation, accessKey)
 
         // 如果目录不存在，尝试创建它
-        if (!directory.exists()) {
-            if (!directory.mkdirs()) {
-                throw IllegalArgumentException("Failed to create directory: $accessKey")
-            }
+        if (!directory.exists() && !directory.mkdirs()) {
+            throw IllegalArgumentException("Failed to create directory: $accessKey")
         }
 
-        // 确保目录存在，从而可以安全地计算文件大小
-        if (directory.isDirectory) {
-            return try {
+        return if (directory.isDirectory) {
+            try {
                 directory.walk().sumOf { it.length().toInt() } / 1024
             } catch (e: Exception) {
                 throw RuntimeException("Error occurred while calculating directory size: ${e.message}", e)
@@ -102,7 +113,6 @@ class FileManipulationUtil {
             throw IllegalArgumentException("Path is not a directory: $accessKey")
         }
     }
-
 
     /**
      * 获取文件名列表
@@ -123,18 +133,14 @@ class FileManipulationUtil {
         val directory = File(rootLocation, accessKey)
 
         // 如果目录不存在，尝试创建它
-        if (!directory.exists()) {
-            if (!directory.mkdirs()) {
-                return emptyList() // 如果创建目录失败，则返回空列表
-            }
+        if (!directory.exists() && !directory.mkdirs()) {
+            return emptyList()
         }
 
-        // 返回所属目录（accessKey）下所有文件名（uuidFileName）
         return if (directory.isDirectory) directory.list()?.toList() ?: emptyList() else emptyList()
     }
 
     fun getLocalAccessKeyList(): List<String> {
-        // 返回所有子文件夹名称（表示的就是accessKey）
         return rootLocation.listFiles()
             ?.filter { it.isDirectory }
             ?.map { it.name }
@@ -142,11 +148,9 @@ class FileManipulationUtil {
     }
 
     fun deleteDirectory(accessKey: String) {
-        // 删除accessKey对应的目录及其所有文件
         val directory = File(rootLocation, accessKey)
         if (directory.exists()) {
             directory.deleteRecursively()
         }
     }
-
 }

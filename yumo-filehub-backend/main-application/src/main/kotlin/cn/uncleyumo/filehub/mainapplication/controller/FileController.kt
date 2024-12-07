@@ -29,7 +29,7 @@ class FileController {
         @RequestParam("file") multipartFile: MultipartFile,
         @RequestParam("validTime") validTime: Int
     ): ResultInfo {
-        ColorPrinter.printlnCyanRed("uploadFile: $multipartFile, $validTime")
+//        ColorPrinter.printlnCyanRed("uploadFile: $multipartFile, $validTime")
         val fileURL: String = fileService.uploadFile(multipartFile, validTime)
 
         return ResultInfo.success(data = fileURL)
