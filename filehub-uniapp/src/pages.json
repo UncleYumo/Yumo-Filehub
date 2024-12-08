@@ -1,0 +1,51 @@
+{
+    "easycom": {
+        "autoscan": true,
+        "custom": {
+            // uni-ui 规则如下配置
+            "^uni-(.*)": "@dcloudio/uni-ui/lib/uni-$1/uni-$1.vue"
+        }
+    },
+	
+    // 其他内容
+    "pages": [
+        {
+            "path": "pages/index/index",
+            "style": {
+                "navigationBarTitleText": "信息统计",
+				"enablePullDownRefresh": true
+            }
+        },
+        {
+            "path": "pages/user-add/user-add",
+            "style": {
+                "navigationBarTitleText": "添加用户"
+            }
+        }
+    ],
+    "globalStyle": {
+        "navigationBarTextStyle": "white",
+        "navigationBarTitleText": "uni-app",
+        "navigationBarBackgroundColor": "#8d54ff",
+        "backgroundColor": "#F8F8F8"
+    },
+    "uniIdRouter": {},
+    "tabBar": {
+        "selectedColor": "#007aff",
+		"spacing": "8px",
+        "list": [
+            {
+                "text": "信息",
+                "pagePath": "pages/index/index",
+				"iconPath": "static/image/tabar_info.png",
+				"selectedIconPath": "static/image/tabar_info_selected.png"
+            },
+            {
+                "text": "添加",
+                "pagePath": "pages/user-add/user-add",
+				"iconPath": "static/image/tabar_add.png",
+				"selectedIconPath": "static/image/tabar_add_selected.png"
+            }
+        ]
+    }
+}
