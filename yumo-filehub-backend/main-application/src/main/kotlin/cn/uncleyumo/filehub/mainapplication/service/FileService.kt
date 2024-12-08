@@ -26,4 +26,6 @@ interface FileService {
     fun getFileList(): List<FileDTO>
 
     fun deleteFile(uuidFileName: String)
+
+    fun markdownInstruction(): String
 }

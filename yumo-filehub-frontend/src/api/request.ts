@@ -5,8 +5,8 @@ import { ElMessage } from 'element-plus'
 import router from "@/router";
 
 const VUE_DEV_BASE_URL: string = 'http://localhost:49153'
-const VUE_RELEASE_BASE_URL: string = 'https://139.224.195.43/filehub'
-const baseURL = VUE_DEV_BASE_URL
+const VUE_RELEASE_BASE_URL: string = 'http://139.224.195.43/filehub'
+const baseURL = VUE_RELEASE_BASE_URL
 
 const instance: AxiosInstance = axios.create({baseURL})
 

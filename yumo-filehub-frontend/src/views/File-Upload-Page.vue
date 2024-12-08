@@ -23,7 +23,7 @@
               <span style="font-size: 16px">Go to github project page</span>
             </el-dropdown-item>
 
-            <el-dropdown-item>
+            <el-dropdown-item @click="goToFAQ()">
               <n-icon size="24" :component="QuestionCircle20Filled"/>
               <span style="font-size: 16px">How to use fileHub?</span>
             </el-dropdown-item>
@@ -124,6 +124,10 @@ const logoutSystem = () => {
           message: 'Logout canceled',
         })
       })
+}
+
+const goToFAQ = () => {
+  router.push('/instruction')
 }
 
 </script>

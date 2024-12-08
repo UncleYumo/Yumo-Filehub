@@ -188,7 +188,6 @@ const submitFile = async () => {
 const handleUploadClick = () => {
   uploadRef?.value?.clearFiles()
   fileName.value = 'No Selected File'
-  console.log('Upload Ref Cleared')
 }
 
 const handleUpload = async () => {
@@ -202,6 +201,8 @@ const handleUpload = async () => {
     target: '.file-upload-container',
   })
 
+  dialogFormVisible.value = false
+
   try {
     let response = await fileUploadService(formData)
     ElMessage({
@@ -210,7 +211,6 @@ const handleUpload = async () => {
       plain: true,
     })
     loadingInstance.close()
-    dialogFormVisible.value = false
     fileURL.value = response.data
     dialogFileURLVisible.value = true
   } catch (error) {
@@ -218,24 +218,21 @@ const handleUpload = async () => {
   }
 }
 
+
 const copyFileURL = async () => {
 
-  try {
-    await navigator.clipboard.writeText(fileURL.value)
-    ElMessage({
-      message: 'File URL copied to clipboard',
-      type: 'success',
-      plain: true,
-    })
-  } catch (err) {
-    ElMessage({
-      message: 'Failed to copy file URL to clipboard',
-      type: 'error',
-      plain: true,
-    })
-  }
+  const el = document.createElement('textarea')
+  el.value = fileURL.value
+  document.body.appendChild(el)
+  el.select()
+  document.execCommand('copy')
+  document.body.removeChild(el)
 
-
+  ElMessage({
+    message: 'File URL copied to clipboard',
+    type: 'success',
+    plain: true,
+  })
 }
 
 </script>

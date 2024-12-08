@@ -73,4 +73,10 @@ class FileController {
         return ResultInfo.success()
     }
 
+    @GetMapping("/markdownInstruction")
+    fun markdownInstruction(): ResultInfo {
+        val instruction: String = fileService.markdownInstruction()
+        return ResultInfo.success(data = instruction)
+    }
+
 }

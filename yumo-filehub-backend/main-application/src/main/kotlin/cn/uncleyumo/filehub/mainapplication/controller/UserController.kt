@@ -88,4 +88,9 @@ class UserController {
         return ResultInfo.success(data = validTime)
     }
 
+    @GetMapping("/test")
+    fun test(): ResultInfo {
+        return ResultInfo.success(data = "Data from UserController - test")
+    }
+
 }

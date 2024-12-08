@@ -23,7 +23,7 @@
               <span style="font-size: 16px">Go to github project page</span>
             </el-dropdown-item>
 
-            <el-dropdown-item>
+            <el-dropdown-item @click="goToFAQ()">
               <n-icon size="24" :component="QuestionCircle20Filled"/>
               <span style="font-size: 16px">How to use filehub?</span>
             </el-dropdown-item>
@@ -112,7 +112,7 @@
           <p style="color: rgb(155,133,251); font-weight: bold; margin: 0;">File-URL</p>
           <n-icon size="24" :component="AddLinkOutlined" style="margin-left: 5px;"></n-icon>
         </div>
-        <span class="text-link-container" style="color: #ffffa6">{{ currentFileViewObject.fileUrl }}</span>
+        <span class="text-link-container" style="color: #ffffa6">{{currentFileViewObject.fileUrl}}</span>
 
       </div>
       <template #footer>
@@ -278,16 +278,22 @@ const deleteSelectedFile = async (fileViewObject: FileListDataViewObject) => {
 }
 
 const handleCopyFileURL = async () => {
-  try {
-    await navigator.clipboard.writeText(currentFileViewObject.value.fileUrl);
-    ElMessage({
-      message: 'File URL copied to clipboard',
-      type: 'success',
-      plain: true
-    });
-  } catch (err) {
-    console.error('Failed to copy: ', err);
-  }
+  const el = document.createElement('textarea');
+  el.value = currentFileViewObject.value.fileUrl;
+  document.body.appendChild(el);
+  el.select();
+  document.execCommand('copy');
+  document.body.removeChild(el);
+
+  ElMessage({
+    message: 'File URL copied successfully',
+    type:'success',
+    plain: true
+  })
+}
+
+const goToFAQ = () => {
+  router.push('/instruction')
 }
 
 onMounted(async () => {
@@ -318,7 +324,7 @@ onMounted(async () => {
 
 
     .dropdown-container {
-      //border: 2px solid #ffffff;
+      border: 2px solid #ffffff;
       border-radius: 8px;
       display: flex;
       margin-right: 8px;
@@ -470,7 +476,7 @@ onMounted(async () => {
 
 
     .dropdown-container {
-      //border: 4px solid #ffffff;
+      border: 4px solid #ffffff;
       border-radius: 8px;
       display: flex;
       margin-right: 24px;
@@ -595,7 +601,7 @@ onMounted(async () => {
 
 
     .dropdown-container {
-      //border: 4px solid #ffffff;
+      border: 4px solid #ffffff;
       border-radius: 8px;
       display: flex;
       margin-right: 24px;

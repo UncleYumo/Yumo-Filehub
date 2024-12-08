@@ -40,6 +40,9 @@ class FileServiceImpl : FileService {
     @Autowired
     private lateinit var userRedisTemplate: RedisTemplate<String, UserDTO>
 
+    @Autowired
+    private lateinit var stringRedisTemplate: StringRedisTemplate
+
     override fun uploadFile(
         file: MultipartFile,
         validTime: Int
@@ -118,5 +121,10 @@ class FileServiceImpl : FileService {
         } else {
             throw IllegalArgumentException("File not found")
         }
+    }
+
+    override fun markdownInstruction(): String {
+        val instruction = stringRedisTemplate.opsForValue().get("markdown:instruction")
+        return instruction ?: throw IllegalArgumentException("Instruction not found")
     }
 }

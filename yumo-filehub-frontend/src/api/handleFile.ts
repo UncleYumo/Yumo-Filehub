@@ -16,3 +16,7 @@ export const deleteFileService = (deleteFileData: any) => {
     }
     return request.delete('/file/delete', {params})
 }
+
+export const markdownInstructionService = () => {
+    return request.get('/file/markdownInstruction')
+}

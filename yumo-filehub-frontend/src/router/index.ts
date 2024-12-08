@@ -6,6 +6,7 @@ import FoundNothingPage from "@/views/Found-Nothing-Page.vue";
 import TokenAuthorizationPage from "@/views/Token-Authorization-Page.vue";
 
 import {useTokenStore} from "@/stores/tokenStore";
+import MarkdownInstructionPage from "@/views/Markdown-Instruction-Page.vue";
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -24,6 +25,11 @@ const router = createRouter({
             path: '/authorize',
             name: 'token-authorization',
             component: TokenAuthorizationPage
+        },
+        {
+            path: '/instruction',
+            name: 'markdown-instruction',
+            component: MarkdownInstructionPage
         },
         {
             path: '/:catchAll(.*)',  // catch all route to handle 404 errors
