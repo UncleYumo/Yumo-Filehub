@@ -10,7 +10,7 @@ const httpInterceptor = {
         options.timeout = 10000;
         options.header = {
             ...options.header,  // 合并请求头
-            'PRIVATE-KEY': 'uncleyumo'
+            'PRIVATE-KEY': '这里保密哦'
         };
     }
 };
