@@ -20,7 +20,7 @@ class AccessKeyUtil {
 
         private const val ALGORITHM = "AES"  // AES encryption algorithm
         private const val TRANSFORMATION = "AES/ECB/PKCS5Padding"  // AES encryption transformation
-        private const val CHECK_CODE = "uncleyumo-filehub!"
+        private const val CHECK_CODE = "这里保密哦！"
 
 
         /*
